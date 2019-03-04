@@ -1,0 +1,28 @@
+{
+  "name": "@directus/extension-toolkit",
+  "version": "0.0.1",
+  "description": "[WIP] Toolkit to help you build your own custom extensions!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/directus/extension-toolkit.git"
+  },
+  "keywords": [
+    "directus",
+    "extensions",
+    "toolkit",
+    "interfaces",
+    "layouts",
+    "pages",
+    "modules"
+  ],
+  "author": "Rijk van Zanten <rijkvanzanten@me.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/directus/extension-toolkit/issues"
+  },
+  "homepage": "https://github.com/directus/extension-toolkit#readme"
+}

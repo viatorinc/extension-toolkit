@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "directus-extensions": "./cli/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/directus/extension-toolkit.git"
@@ -24,5 +27,11 @@
   "bugs": {
     "url": "https://github.com/directus/extension-toolkit/issues"
   },
-  "homepage": "https://github.com/directus/extension-toolkit#readme"
+  "homepage": "https://github.com/directus/extension-toolkit#readme",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "jsonminify": "^0.4.1",
+    "parcel-bundler": "^1.12.3",
+    "yargs": "^13.2.2"
+  }
 }

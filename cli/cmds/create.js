@@ -39,6 +39,7 @@ exports.handler = function(argv) {
   function parseTemplate(file, src = true) {
     const template = fs.readFileSync(path.join(__dirname, "../templates", file), "utf8");
     const fileContent = ejs.render(template, { name });
+    if (file === "gitignore") file = ".gitignore";
     fs.writeFileSync(path.join(name, src ? "src" : "", file), fileContent);
   }
 }

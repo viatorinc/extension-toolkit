@@ -25,7 +25,7 @@ exports.handler = function(argv) {
   fs.mkdirSync(path.join(name, "src"));
 
   const files = {
-    all: ["package.json", "readme.md", ".gitignore"],
+    all: ["package.json", "readme.md", "gitignore"],
     interface: ["input.vue", "display.vue", "meta.json"],
     layout: ["layout.vue", "options.vue", "meta.json"],
     page: ["page.vue", "meta.json"]

@@ -4,7 +4,7 @@
 ## Installation
 
 ```
-npm install -f @directus/extension-toolkit
+npm install -g @directus/extension-toolkit
 ```
 
 ## Usage

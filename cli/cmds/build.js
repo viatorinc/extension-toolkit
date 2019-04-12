@@ -15,7 +15,8 @@ exports.handler = async function(argv) {
   const bundler = new Bundler(entryFiles, {
     outDir: output,
     watch: false,
-    minify: true
+    minify: true,
+    global: "__DirectusExtension__"
   });
 
   await bundler.bundle();

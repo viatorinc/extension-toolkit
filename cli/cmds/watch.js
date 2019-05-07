@@ -3,7 +3,8 @@ const Bundler = require("parcel-bundler");
 const path = require("path");
 const jsonminify = require("jsonminify");
 
-exports.command = "watch [input] [output]";
+exports.command = "watch [input|--input] [output|--output]";
+
 exports.desc = "Watch the source files for changes and rebuild";
 exports.handler = async function(argv) {
   let { input, output } = argv;

@@ -3,9 +3,6 @@
   "version": "0.0.5",
   "description": "[WIP] Toolkit to help you build your own custom extensions!",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
     "directus-extensions": "./cli/index.js"
   },

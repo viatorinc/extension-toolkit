@@ -33,6 +33,11 @@ module.exports = {
       type: Boolean,
       default: false
     },
+    // Name of the collection
+    collection: {
+      type: String,
+      default: null
+    },
     // If the field is required or not
     required: {
       type: Boolean,

@@ -39,6 +39,10 @@ module.exports = {
     sortField: {
       type: String,
       default: null
+    },
+    collection: {
+      type: String,
+      default: null
     }
   }
 };

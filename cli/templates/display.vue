@@ -11,7 +11,8 @@
     mixins: [mixin],
     computed: {
       displayValue() {
-        return this.value.toLowerCase();
+        if (this.value)
+          return this.value.toLowerCase();
       }
     }
   }

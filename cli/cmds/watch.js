@@ -17,7 +17,8 @@ exports.handler = async function(argv) {
     outDir: output,
     watch: true,
     minify: false,
-    global: "__DirectusExtension__"
+    global: "__DirectusExtension__",
+    publicUrl: './'
   });
 
   await bundler.bundle();

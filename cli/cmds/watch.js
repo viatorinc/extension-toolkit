@@ -6,8 +6,13 @@ const jsonminify = require("jsonminify");
 exports.command = "watch [input|--input] [output|--output]";
 
 exports.desc = "Watch the source files for changes and rebuild";
+exports.builder = {
+  cacheDir: {
+    default: '.cache'
+  }
+};
 exports.handler = async function(argv) {
-  let { input, output } = argv;
+  let { input, output, cacheDir } = argv;
   input = input || "src";
   output = output || "dist";
 
@@ -18,6 +23,7 @@ exports.handler = async function(argv) {
     watch: true,
     minify: false,
     global: "__DirectusExtension__",
+    cacheDir,
     publicUrl: './'
   });
 

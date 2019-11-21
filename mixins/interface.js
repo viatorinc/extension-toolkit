@@ -69,6 +69,19 @@ module.exports = {
     values: {
       type: Object,
       default: null
+    },
+    width: {
+      type: String,
+      default: null,
+      validator(val) {
+        return [
+          'half',
+          'half-left',
+          'half-right',
+          'full',
+          'fill'
+        ].includes(val);
+      }
     }
   }
 };

@@ -8,7 +8,7 @@ exports.desc = "Create a new custom extension";
 exports.handler = function(argv) {
   const { type, name } = argv;
 
-  const allowedTypes = ["interface", "layout", "page"];
+  const allowedTypes = ["interface", "layout", "module"];
 
   if (allowedTypes.includes(type) === false)
     return console.log("Invalid type provided. Allowed types: " + allowedTypes.join(", "));
@@ -28,7 +28,7 @@ exports.handler = function(argv) {
     all: ["package.json", "readme.md", "gitignore"],
     interface: ["input.vue", "display.vue", "meta.json"],
     layout: ["layout.vue", "options.vue", "meta.json"],
-    page: ["page.vue", "meta.json"]
+    module: ["module.vue", "meta.json"]
   };
 
   files.all.forEach(file => parseTemplate(file, false));

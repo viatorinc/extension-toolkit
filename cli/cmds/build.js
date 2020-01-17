@@ -3,15 +3,21 @@ const Bundler = require("parcel-bundler");
 const path = require("path");
 const jsonminify = require("jsonminify");
 
-exports.command = "build [input] [output]";
+exports.command = "build [--no-source-maps] [input] [output]";
 exports.desc = "Build the source files for production use";
-exports.builder = {
-  cacheDir: {
-    default: '.cache'
-  }
+exports.builder = yargs => {
+  yargs.option('source-maps', {
+    boolean: true,
+    default: true,
+    describe: 'Skip source maps generation'
+  });
+  yargs.option('cache-dir', {
+    default: '.cache',
+  });
+  return yargs;
 };
 exports.handler = async function(argv) {
-  let { input, output, cacheDir } = argv;
+  let { input, output, cacheDir, sourceMaps } = argv;
   input = input || "src";
   output = output || "dist";
 
@@ -23,6 +29,7 @@ exports.handler = async function(argv) {
     minify: true,
     global: "__DirectusExtension__",
     cacheDir,
+    sourceMaps,
     publicUrl: './'
   });
 

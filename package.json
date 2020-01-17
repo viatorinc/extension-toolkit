@@ -1,6 +1,6 @@
 {
   "name": "@directus/extension-toolkit",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "[WIP] Toolkit to help you build your own custom extensions!",
   "main": "index.js",
   "bin": {

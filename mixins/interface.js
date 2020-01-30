@@ -38,6 +38,11 @@ module.exports = {
       type: String,
       default: null
     },
+    // Primary key of the item you're editing in this context
+    primaryKey: {
+      type: [Number, String],
+      default: null
+    },
     // If the field is required or not
     required: {
       type: Boolean,

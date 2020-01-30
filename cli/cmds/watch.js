@@ -18,7 +18,7 @@ exports.builder = yargs => {
   return yargs;
 };
 exports.handler = async function(argv) {
-  let { input, output, cacheDir } = argv;
+  let { input, output, cacheDir, sourceMaps } = argv;
   input = input || "src";
   output = output || "dist";
 

@@ -31,7 +31,7 @@ This transpiles files from the `./src` folder and outputs the files into the `./
 
 
 ```
-npm run build --input ./path/to/src/folder --output ./path/to/output/folder
+npm run build -- --input ./path/to/src/folder --output ./path/to/output/folder
 ```
 This works the same as the previous `build` command, but allows you to specify an input and output folder, instead of using the default values.
 
@@ -43,7 +43,7 @@ This transpiles files from the `./src` folder and outputs the files into the `./
 
 
 ```
-npm run dev --input ./path/to/src/folder --output ./path/to/output/folder
+npm run dev -- --input ./path/to/src/folder --output ./path/to/output/folder
 ```
 This works the same as the previous `dev` command, but allows you to specify an input and output folder, instead of using the default values.
 
@@ -77,7 +77,7 @@ where `directus` is the folder where your running Directus instance is, and `dev
 
 For the above setup, run the following command from inside `/path/to/development/my-first-interface` to build the extension into Directus
 ```
-npm run build --input ./src --output /path/to/directus/public/extensions/custom/interfaces/my-first-interface
+npm run build -- --input ./src --output /path/to/directus/public/extensions/custom/interfaces/my-first-interface
 ```
 If you're actively developing, you can use the `npm run dev` command with the same input/output options.
 

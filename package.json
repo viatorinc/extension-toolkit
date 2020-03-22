@@ -2,9 +2,16 @@
   "name": "@directus/extension-toolkit",
   "version": "0.8.0",
   "description": "[WIP] Toolkit to help you build your own custom extensions!",
-  "main": "index.js",
+  "main": ".cli/index.ts",
   "bin": {
     "directus-toolkit": "./cli/index.ts"
+  },
+  "scripts": {
+    "start": "nodemon --watch 'cli/**/*.ts' --exec ts-node cli/index.ts",
+    "create": "npm run build && npm run test",
+    "build": "tsc -p .",
+    "test": "npm i -g && directus-toolkit",
+    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   },
   "repository": {
     "type": "git",
@@ -25,15 +32,21 @@
   },
   "homepage": "https://github.com/directus/extension-toolkit#readme",
   "dependencies": {
+    "clear": "^0.1.0",
+    "commander": "^5.0.0",
     "ejs": "^2.7.1",
+    "figlet": "^1.3.0",
     "jsonminify": "^0.4.1",
     "parcel-bundler": "^1.12.4",
-    "ts-node": "^8.8.1",
-    "typescript": "^3.8.3",
-    "yargs": "^13.3.0"
+    "path": "^0.12.7"
   },
   "devDependencies": {
+    "@types/clear": "^0.1.0",
+    "@types/figlet": "^1.2.0",
     "@types/node": "^13.9.3",
-    "@types/yargs": "^15.0.4"
+    "@types/yargs": "^15.0.4",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.8.1",
+    "typescript": "^3.8.3"
   }
 }

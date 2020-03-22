@@ -3,17 +3,7 @@ import path from 'path'
 import { camelToSnake } from '../util/util'
 import Table from '../util/table'
 
-export const command = "docs [folders]";
-export const desc = "Create a readme for each component, interface";
-
-export const builder = {
-    folders: {
-        default: 'all'
-    }
-}
-    
-
-export const handler = function(argv: { folders: string }) {
+export const docs = function(argv: { folders: string }) {
     const { folders } = argv
 
     console.log("test");

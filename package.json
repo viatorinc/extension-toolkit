@@ -4,7 +4,7 @@
   "description": "[WIP] Toolkit to help you build your own custom extensions!",
   "main": "index.js",
   "bin": {
-    "directus-extensions": "./cli/index.js"
+    "directus-toolkit": "./cli/index.js"
   },
   "repository": {
     "type": "git",

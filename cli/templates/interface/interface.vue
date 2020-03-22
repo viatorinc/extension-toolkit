@@ -1,0 +1,22 @@
+<template>
+	<v-{0}>
+    </v-{0}>
+</template>
+
+<script lang="ts">
+import {{ defineComponent, PropType, ref }} from '@vue/composition-api';
+
+export default defineComponent({{
+	props: {1},
+	setup(props, {{ emit }}) {{
+
+		function onChange(event: boolean) {{
+			emit('input', event);
+		}}
+
+		return {{ onChange }};
+	}}
+}});
+</script>
+<style lang="scss" scoped>
+</style>

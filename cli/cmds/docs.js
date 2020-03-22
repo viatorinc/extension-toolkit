@@ -2,6 +2,7 @@ const fs = require("fs");
 const { exec } = require("child_process");
 const path = require("path");
 const ejs = require("ejs");
+var Table = require("../table")
 
 exports.command = "docs [folders]";
 exports.desc = "Create a readme for each component, interface";
@@ -48,39 +49,30 @@ function createDocs(folder, element) {
     let readme = fs.readFileSync(readmeFile).toString('utf8')
     readme = readme.replace(/(\r|\t)/g, '')
 
-    getTable(readme, 'Props')
+    const table = Table.getTable(readme, 'Props')
+    if(table) {
+
+        table.generateTableString()
+
+        table.updateColumn('Type')
+        
+        Object.entries(props).forEach(entry => {
+            let required = entry[1].required || 'false'
+            let prop = '`'+camelToSnake(entry[0])+'`'
+            if(required == 'true')prop += '*'
+            let def = entry[1].default || ''
+            def = '`' + def + '`'
+            let type = entry[1].type || ''
+            table.updateRow([prop, '', def, type])
+        })
+
+        table.generateTableString()
+    }
+        
 }
 
-function getTable(text, name) {
-    
-    text = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|\\n`,'m'))
-    
-    if(!text) {
-        return console.log("No Table detected");
-    } else {
-        text = text[0]
-    }
-
-    let i = text.indexOf('## '+name)
-    let start = i
-
-    while(text.charAt(i) != '|'){i++}
-    categories = []
-    categorie = ""
-
-    while(text.charAt(i) != '\n') {
-        let c = text.charAt(i)
-
-        if(c == '|') {
-            categories.push(categorie)
-            categorie = ""
-        } else {
-            categorie += c
-        }
-        i++
-    }
-    console.log(categories);
-    
+function camelToSnake(name) {
+    return name.replace(/([A-Z0-9])/g, (group) => "-"+group.toLowerCase())
 }
 
 function getProps(section) {
@@ -126,5 +118,5 @@ function propOptionsToObject(prop) {
 }
 
 function getSection(text, name) {
-    return text.match(new RegExp(`<${name}.*?>(.|\\s)*?</${name}.*?>`, 'gm')).toString()
+    return text.match(new RegExp(`<${name}.*?>(.|\\s)*?</${name}.*?>`, 'gm'))[0]
 }

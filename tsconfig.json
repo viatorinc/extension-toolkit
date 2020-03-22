@@ -1,11 +1,18 @@
 {
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
     "lib": ["es6", "es2015", "dom"],
     "declaration": true,
-    "outDir": "lib",
-    "rootDir": "cli",
+    "outDir": "bin",
+    "rootDir": "src",
     "strict": true,
     "types": ["node"],
     "esModuleInterop": true,

@@ -80,7 +80,8 @@ export default class Table {
             console.log("No Table detected");
             return null
         } else {
-            tableString = tableString[0]
+            console.log("Table detected");
+            tableString = table[0]
         }
     
         let lines = tableString.replace(/\n$/g, '').split('\n') // remove last newline and split at each other newline

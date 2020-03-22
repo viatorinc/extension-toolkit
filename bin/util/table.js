@@ -79,7 +79,8 @@ var Table = /** @class */ (function () {
             return null;
         }
         else {
-            tableString = tableString[0];
+            console.log("Table detected");
+            tableString = table[0];
         }
         var lines = tableString.replace(/\n$/g, '').split('\n'); // remove last newline and split at each other newline
         var columns = lines[1].replace(/(^\||\|$)/g, '').split('|').map(function (column) { return column.replace(/\s+/g, ' ').replace(/(^ | $)/g, ''); });

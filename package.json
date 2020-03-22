@@ -2,9 +2,9 @@
   "name": "@directus/extension-toolkit",
   "version": "0.8.0",
   "description": "[WIP] Toolkit to help you build your own custom extensions!",
-  "main": ".cli/index.ts",
+  "main": "./src/index.ts",
   "bin": {
-    "directus-toolkit": "./cli/index.ts"
+    "directus-toolkit": "./bin/index.js"
   },
   "scripts": {
     "start": "nodemon --watch 'cli/**/*.ts' --exec ts-node cli/index.ts",

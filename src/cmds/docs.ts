@@ -3,11 +3,7 @@ import path from 'path'
 import { camelToSnake } from '../util/util'
 import Table from '../util/table'
 
-export const docs = function(argv: { folders: string }) {
-    const { folders } = argv
-
-    console.log("test");
-    
+export const docs = function(folders: string) {
 
     const allowedFolders = ['all', 'interfaces', 'components']
 

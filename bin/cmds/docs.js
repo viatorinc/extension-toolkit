@@ -7,16 +7,7 @@ var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var util_1 = require("../util/util");
 var table_1 = __importDefault(require("../util/table"));
-exports.command = "docs [folders]";
-exports.desc = "Create a readme for each component, interface";
-exports.builder = {
-    folders: {
-        default: 'all'
-    }
-};
-exports.handler = function (argv) {
-    var folders = argv.folders;
-    console.log("test");
+exports.docs = function (folders) {
     var allowedFolders = ['all', 'interfaces', 'components'];
     if (allowedFolders.includes(folders) == false) {
         return console.log("Invalid folder!");

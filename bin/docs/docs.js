@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
-var util_1 = require("../util/util");
-var table_1 = __importDefault(require("../util/table"));
+var table_1 = __importDefault(require("./table"));
+var merge_1 = require("./merge");
 exports.docs = function (folders) {
     var allowedFolders = ['all', 'interfaces', 'components'];
     if (allowedFolders.includes(folders) == false) {
@@ -23,10 +23,10 @@ function createDocs(folder, elementName) {
     var folderLocation = path_1.default.join('src', folder, elementName);
     var vueFile = path_1.default.join(folderLocation, elementName + '.vue');
     var readmeFile = path_1.default.join(folderLocation, 'readme.md');
+    var newReadmeFile = path_1.default.join(folderLocation, 'new-readme.md');
     if (!fs_1.default.existsSync(vueFile)) {
         return console.log("No Element detected: ", elementName);
     }
-    console.log(elementName);
     var file = fs_1.default.readFileSync(vueFile).toString('utf8');
     var script = getSection(file.replace(/(\r|\n|\t)/g, ''), 'script'); // remove any whitespace character exept space
     if (!script)
@@ -41,44 +41,35 @@ function createDocs(folder, elementName) {
         console.log("Created Readme for: ", elementName, " at ", readmeFile);
     }
     var readme = fs_1.default.readFileSync(readmeFile).toString('utf8');
-    readme = readme.replace(/(\r|\t)/g, '');
-    var propsTable = table_1.default.getTable(readme, 'Props');
-    if (propsTable) {
-        propsTable.generateTableString();
-        propsTable.updateColumn('Prop');
-        propsTable.updateColumn('Description');
-        propsTable.updateColumn('Type');
-        Object.entries(props).forEach(function (entry) {
-            var required = entry[1].required || 'false';
-            var prop = util_1.wrapText(util_1.camelToSnake(entry[0]), '`');
-            if (required == 'true')
-                prop += '*';
-            var def = entry[1].default || '';
-            var type = entry[1].type || '';
-            propsTable.updateRowByObject({
-                Prop: prop,
-                Default: util_1.wrapText(def, '`'),
-                Type: util_1.wrapText(type, '`')
-            }, 'Prop');
-        });
-        propsTable.hideNoneExistingRows(Object.keys(props).map(function (prop) { return util_1.wrapText(util_1.camelToSnake(prop), '`'); }));
-        propsTable.generateTableString();
+    readme = readme.replace(/(\r)/g, '');
+    var propsTable = table_1.default.getTable(readme, 'Props') || new table_1.default('Props', ['Prop', 'Description', 'Default', 'Type'], []);
+    merge_1.mergeProps(propsTable, props);
+    readme = replaceTable(readme, 'Props', propsTable);
+    var cssVarTable = table_1.default.getTable(readme, 'CSS Variables') || new table_1.default('CSS Variables', ['Variable', 'Default'], []);
+    merge_1.mergeCssVars(cssVarTable, cssVars);
+    readme = replaceTable(readme, 'CSS Variables', cssVarTable);
+    if (fs_1.default.existsSync(newReadmeFile)) {
+        fs_1.default.unlinkSync(newReadmeFile);
     }
-    var cssVarTable = table_1.default.getTable(readme, 'CSS Variables');
-    if (cssVarTable) {
-        console.log(cssVarTable.generateTableString());
-        cssVarTable.updateColumn('Variable');
-        cssVarTable.updateColumn('Default');
-        Object.entries(cssVars).forEach(function (entry) {
-            var variable = entry[0], def = entry[1];
-            cssVarTable.updateRowByObject({
-                Variable: util_1.wrapText(variable, '`'),
-                Default: util_1.wrapText(def, '`')
-            }, 'Variable');
-        });
-        cssVarTable.hideNoneExistingRows(Object.keys(cssVars).map(function (cssVar) { return util_1.wrapText(cssVar, '`'); }));
-        console.log(cssVarTable.generateTableString());
+    var changes = [];
+    if (propsTable.changed)
+        changes.push("Props");
+    if (cssVarTable.changed)
+        changes.push("CSS Variables");
+    if (changes.length > 0)
+        console.log(elementName + ": Changes for " + changes.join(', '));
+    fs_1.default.writeFileSync(newReadmeFile, readme);
+}
+function replaceTable(readme, name, newTable) {
+    var regex = new RegExp("## " + name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm');
+    var match = readme.match(regex);
+    if (match) {
+        readme = readme.replace(regex, newTable.generateTableString());
     }
+    else {
+        readme += "\n" + newTable.generateTableString();
+    }
+    return readme;
 }
 function getCssVars(section, elementName) {
     var cssVarsObject = {};

@@ -4,6 +4,7 @@ export default class Table {
     name: string;
     columnSizes: number[];
     hiddenRows: number[];
+    changed: boolean;
     constructor(name: string, columns: string[], rows: string[][]);
     updateColumn(column: string, values?: string[]): void;
     updateRowByObject(newRow: {

@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var clear_1 = __importDefault(require("clear"));
 var figlet_1 = __importDefault(require("figlet"));
 var commander_1 = __importDefault(require("commander"));
-var docs_1 = require("./cmds/docs");
+var docs_1 = require("./docs/docs");
 clear_1.default();
 console.log(figlet_1.default.textSync('Toolkit', { horizontalLayout: 'full', font: 'Doom' }));
 commander_1.default

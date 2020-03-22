@@ -3,7 +3,7 @@
 import clear from 'clear';
 import figlet from 'figlet';
 import program from 'commander';
-import {docs} from './cmds/docs'
+import {docs} from './docs/docs'
 
 clear();
 console.log(figlet.textSync('Toolkit', {horizontalLayout: 'full', font: 'Doom'} ));

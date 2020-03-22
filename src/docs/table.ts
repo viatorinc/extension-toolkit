@@ -3,6 +3,8 @@ export default class Table {
     rows: string[][]
     name: string
     columnSizes: number[] = []
+    hiddenRows: number[] = []
+    changed: boolean = false
     
     constructor(name: string, columns: string[], rows: string[][]) {
         this.columns = columns
@@ -18,8 +20,11 @@ export default class Table {
             let index = this.columns.findIndex(title => title == column)
 
             values.forEach((value, i) => {
-                if(i < this.rows.length && value != '')
+                if(i < this.rows.length && value != '') {
                     this.rows[i][index] = value
+                    this.changed = true
+                }
+                    
             })
         } else {
             this.columns.push(column)
@@ -29,19 +34,72 @@ export default class Table {
                 else
                     row.push('')
             })
+            this.changed = true
         }
+        
         this.calcColumnSizes()
     }
     
-    updateRow(newRow: string[]) {
+    updateRowByObject(newRow: {[key: string]: string}, keyColumn: string) {
+        let column = this.columns.indexOf(keyColumn)
+        if(column == -1) return
+        let row = this.rows.findIndex(row => row[column] == newRow[keyColumn])
+        if(row != -1) {
+            Object.entries(newRow).forEach(entry => {
+                const [key, value] = entry
+                let i = this.columns.indexOf(key)
+                if(i != -1) {
+                    this.rows[row][i] = value
+                    this.changed = true
+                }
+            })
+        } else {
+
+            let newRowArray = []
+            for (let i = 0; i < this.columns.length; i++) {
+                newRowArray.push('')
+            }
+            row = this.rows.length
+            this.rows.push(newRowArray)
+
+            Object.entries(newRow).forEach(entry => {
+                const [key, value] = entry
+                let i = this.columns.indexOf(key)
+                if(i != -1) {
+                    this.rows[row][i] = value
+                }
+            })
+            this.changed = true
+        }
+        this.calcColumnSizes()
+    }
+
+    updateRowByArray(newRow: string[]) {
+        if(newRow.length != this.columns.length) {
+            console.log(`New row count doesn't match the size of the table. Expected ${this.columns.length}, got ${newRow.length}`);
+            return
+        }
+            
         let index = this.rows.findIndex(row => row[0] == newRow[0])
         if( index != -1) {
             this.rows[index] = this.rows[index].map((field, i) => newRow[i] == '' ? field : newRow[i])
         } else {
             this.rows.push(newRow)
+            
         }
-
+        this.changed = true
         this.calcColumnSizes()
+    }
+
+    hideNoneExistingRows(existingRows: string[]) {
+        this.hiddenRows = []
+        this.rows.forEach((row, index) => {
+            if(!existingRows.includes(row[0])) {
+                this.hiddenRows.push(index)
+                this.changed = true
+            }
+                
+        })
     }
     
     generateTableString() {
@@ -50,6 +108,11 @@ export default class Table {
         let table = [this.columns, this.columnSizes.map(size => "-".repeat(size + 2)), ...this.rows]
 
         table.forEach((row, rowIndex) => {
+
+            const hidden = this.hiddenRows.includes(rowIndex - 2) && rowIndex > 1
+
+            if(hidden) tableString += "<!-- " // (rowIndex - 2) to accommodate for the header
+
             row.forEach((field, index) => {
                 if(rowIndex == 1) {
                     tableString += "|" + field
@@ -59,9 +122,10 @@ export default class Table {
                     tableString += " ".repeat(this.columnSizes[index] - field.length + 1)
                 }
             });
-            tableString += "|\n"
+            tableString += "|"
+            if(hidden) tableString += " -->"
+            tableString += "\n"
         })
-        console.log(tableString);
         
         return tableString
     }
@@ -73,14 +137,13 @@ export default class Table {
 
     static getTable = function(text: string, name: string): Table | null {
     
-        let table = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|\\n`,'m'))
+        let table = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m'))
         let tableString = ""
         
         if(!table) {
-            console.log("No Table detected");
+            console.log(`No Table with name ${name} detected`);
             return null
         } else {
-            console.log("Table detected");
             tableString = table[0]
         }
     

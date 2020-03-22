@@ -11,6 +11,7 @@ var Table = /** @class */ (function () {
     function Table(name, columns, rows) {
         this.columnSizes = [];
         this.hiddenRows = [];
+        this.changed = false;
         this.columns = columns;
         this.rows = rows;
         this.name = name;
@@ -22,8 +23,10 @@ var Table = /** @class */ (function () {
         if (this.columns.includes(column)) {
             var index_1 = this.columns.findIndex(function (title) { return title == column; });
             values.forEach(function (value, i) {
-                if (i < _this.rows.length && value != '')
+                if (i < _this.rows.length && value != '') {
                     _this.rows[i][index_1] = value;
+                    _this.changed = true;
+                }
             });
         }
         else {
@@ -34,6 +37,7 @@ var Table = /** @class */ (function () {
                 else
                     row.push('');
             });
+            this.changed = true;
         }
         this.calcColumnSizes();
     };
@@ -49,6 +53,7 @@ var Table = /** @class */ (function () {
                 var i = _this.columns.indexOf(key);
                 if (i != -1) {
                     _this.rows[row][i] = value;
+                    _this.changed = true;
                 }
             });
         }
@@ -66,6 +71,7 @@ var Table = /** @class */ (function () {
                     _this.rows[row][i] = value;
                 }
             });
+            this.changed = true;
         }
         this.calcColumnSizes();
     };
@@ -81,14 +87,17 @@ var Table = /** @class */ (function () {
         else {
             this.rows.push(newRow);
         }
+        this.changed = true;
         this.calcColumnSizes();
     };
     Table.prototype.hideNoneExistingRows = function (existingRows) {
         var _this = this;
         this.hiddenRows = [];
         this.rows.forEach(function (row, index) {
-            if (!existingRows.includes(row[0]))
+            if (!existingRows.includes(row[0])) {
                 _this.hiddenRows.push(index);
+                _this.changed = true;
+            }
         });
     };
     Table.prototype.generateTableString = function () {
@@ -122,7 +131,7 @@ var Table = /** @class */ (function () {
         this.columnSizes = tableTransposed.map(function (column) { return Math.max.apply(Math, column); });
     };
     Table.getTable = function (text, name) {
-        var table = text.match(new RegExp("## " + name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|\\n", 'm'));
+        var table = text.match(new RegExp("## " + name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm'));
         var tableString = "";
         if (!table) {
             console.log("No Table with name " + name + " detected");

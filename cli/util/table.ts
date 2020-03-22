@@ -1,6 +1,10 @@
-class Table {
+export default class Table {
+    columns: string[]
+    rows: string[][]
+    name: string
+    columnSizes: number[] = []
     
-    constructor(name, columns, rows) {
+    constructor(name: string, columns: string[], rows: string[][]) {
         this.columns = columns
         this.rows = rows
         this.name = name
@@ -9,7 +13,7 @@ class Table {
         
     }
 
-    updateColumn = function(column, values = []) {
+    updateColumn(column: string, values: string[] = []) {
         if(this.columns.includes(column)) {
             let index = this.columns.findIndex(title => title == column)
 
@@ -29,7 +33,7 @@ class Table {
         this.calcColumnSizes()
     }
     
-    updateRow = function(newRow) {
+    updateRow(newRow: string[]) {
         let index = this.rows.findIndex(row => row[0] == newRow[0])
         if( index != -1) {
             this.rows[index] = this.rows[index].map((field, i) => newRow[i] == '' ? field : newRow[i])
@@ -40,7 +44,7 @@ class Table {
         this.calcColumnSizes()
     }
     
-    generateTableString = function() {
+    generateTableString() {
         let tableString = `## ${this.name}\n`
 
         let table = [this.columns, this.columnSizes.map(size => "-".repeat(size + 2)), ...this.rows]
@@ -62,16 +66,17 @@ class Table {
         return tableString
     }
 
-    calcColumnSizes = function() {
+    calcColumnSizes() {
         const tableTransposed = this.columns.map((col, i) => [this.columns, ...this.rows].map(row => row[i].length))
         this.columnSizes = tableTransposed.map(column => Math.max(...column))        
     }
 
-    static getTable = function(text, name) {
+    static getTable = function(text: string, name: string): Table | null {
     
-        let tableString = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|\\n`,'m'))
+        let table = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|\\n`,'m'))
+        let tableString = ""
         
-        if(!tableString) {
+        if(!table) {
             console.log("No Table detected");
             return null
         } else {
@@ -89,4 +94,3 @@ class Table {
         return new Table(name, columns, rows)
     }
 }
-module.exports = Table

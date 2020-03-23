@@ -10,9 +10,6 @@ export default class Table {
         this.columns = columns
         this.rows = rows
         this.name = name
-        
-        this.calcColumnSizes()
-        
     }
 
     updateColumn(column: string, values: string[] = []) {
@@ -36,8 +33,6 @@ export default class Table {
             })
             this.changed = true
         }
-        
-        this.calcColumnSizes()
     }
     
     updateRowByObject(newRow: {[key: string]: string}, keyColumn: string) {
@@ -71,7 +66,6 @@ export default class Table {
             })
             this.changed = true
         }
-        this.calcColumnSizes()
     }
 
     updateRowByArray(newRow: string[]) {
@@ -82,13 +76,19 @@ export default class Table {
             
         let index = this.rows.findIndex(row => row[0] == newRow[0])
         if( index != -1) {
-            this.rows[index] = this.rows[index].map((field, i) => newRow[i] == '' ? field : newRow[i])
+            this.rows[index] = this.rows[index].map((field, i) => {
+                if(newRow[i] == '') {
+                    return field
+                } else {
+                    this.changed = true
+                    return newRow[i]
+                }
+            })
         } else {
             this.rows.push(newRow)
             
         }
         this.changed = true
-        this.calcColumnSizes()
     }
 
     hideNoneExistingRows(existingRows: string[]) {
@@ -101,8 +101,22 @@ export default class Table {
                 
         })
     }
+
+    merge(table: Table, keyColumn: string) {
+        table.columns.forEach(column => this.updateColumn(column))
+
+        const columnIndex = this.columns.indexOf(keyColumn)
+
+        table.rows.forEach(row => {
+            this.updateRowByArray(row)
+        })
+
+        this.hideNoneExistingRows(table.rows.map(row => row[columnIndex]))
+    }
     
     generateTableString() {
+        this.calcColumnSizes()
+
         let tableString = `## ${this.name}\n`
 
         let table = [this.columns, this.columnSizes.map(size => "-".repeat(size + 2)), ...this.rows]
@@ -156,5 +170,16 @@ export default class Table {
             rows.push(fields)
         }
         return new Table(name, columns, rows)
+    }
+
+    replaceInReadme(readme: string): string {
+        const regex = new RegExp(`## ${this.name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m')
+        let match = readme.match(regex)
+        if(match) {
+            readme = readme.replace(regex, this.generateTableString())
+        } else {
+            readme += "\n" + this.generateTableString()
+        }
+        return readme
     }
 }

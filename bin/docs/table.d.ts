@@ -12,7 +12,9 @@ export default class Table {
     }, keyColumn: string): void;
     updateRowByArray(newRow: string[]): void;
     hideNoneExistingRows(existingRows: string[]): void;
+    merge(table: Table, keyColumn: string): void;
     generateTableString(): string;
     calcColumnSizes(): void;
     static getTable: (text: string, name: string) => Table | null;
+    replaceInReadme(readme: string): string;
 }

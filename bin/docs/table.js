@@ -15,7 +15,6 @@ var Table = /** @class */ (function () {
         this.columns = columns;
         this.rows = rows;
         this.name = name;
-        this.calcColumnSizes();
     }
     Table.prototype.updateColumn = function (column, values) {
         var _this = this;
@@ -39,7 +38,6 @@ var Table = /** @class */ (function () {
             });
             this.changed = true;
         }
-        this.calcColumnSizes();
     };
     Table.prototype.updateRowByObject = function (newRow, keyColumn) {
         var _this = this;
@@ -73,22 +71,29 @@ var Table = /** @class */ (function () {
             });
             this.changed = true;
         }
-        this.calcColumnSizes();
     };
     Table.prototype.updateRowByArray = function (newRow) {
+        var _this = this;
         if (newRow.length != this.columns.length) {
             console.log("New row count doesn't match the size of the table. Expected " + this.columns.length + ", got " + newRow.length);
             return;
         }
         var index = this.rows.findIndex(function (row) { return row[0] == newRow[0]; });
         if (index != -1) {
-            this.rows[index] = this.rows[index].map(function (field, i) { return newRow[i] == '' ? field : newRow[i]; });
+            this.rows[index] = this.rows[index].map(function (field, i) {
+                if (newRow[i] == '') {
+                    return field;
+                }
+                else {
+                    _this.changed = true;
+                    return newRow[i];
+                }
+            });
         }
         else {
             this.rows.push(newRow);
         }
         this.changed = true;
-        this.calcColumnSizes();
     };
     Table.prototype.hideNoneExistingRows = function (existingRows) {
         var _this = this;
@@ -100,8 +105,18 @@ var Table = /** @class */ (function () {
             }
         });
     };
+    Table.prototype.merge = function (table, keyColumn) {
+        var _this = this;
+        table.columns.forEach(function (column) { return _this.updateColumn(column); });
+        var columnIndex = this.columns.indexOf(keyColumn);
+        table.rows.forEach(function (row) {
+            _this.updateRowByArray(row);
+        });
+        this.hideNoneExistingRows(table.rows.map(function (row) { return row[columnIndex]; }));
+    };
     Table.prototype.generateTableString = function () {
         var _this = this;
+        this.calcColumnSizes();
         var tableString = "## " + this.name + "\n";
         var table = __spreadArrays([this.columns, this.columnSizes.map(function (size) { return "-".repeat(size + 2); })], this.rows);
         table.forEach(function (row, rowIndex) {
@@ -129,6 +144,17 @@ var Table = /** @class */ (function () {
         var _this = this;
         var tableTransposed = this.columns.map(function (col, i) { return __spreadArrays([_this.columns], _this.rows).map(function (row) { return row[i].length; }); });
         this.columnSizes = tableTransposed.map(function (column) { return Math.max.apply(Math, column); });
+    };
+    Table.prototype.replaceInReadme = function (readme) {
+        var regex = new RegExp("## " + this.name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm');
+        var match = readme.match(regex);
+        if (match) {
+            readme = readme.replace(regex, this.generateTableString());
+        }
+        else {
+            readme += "\n" + this.generateTableString();
+        }
+        return readme;
     };
     Table.getTable = function (text, name) {
         var table = text.match(new RegExp("## " + name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm'));

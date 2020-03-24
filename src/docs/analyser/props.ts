@@ -5,8 +5,6 @@ import { camelToSnake, wrapText } from '../../util/util'
 export default class PropsAnalyser extends ModuleAnalyser {
 
     read(): Table {
-        this.moduleKey = "Prop"
-
         const table = new Table('Props', ['Prop', 'Description', 'Default', 'Type'], [])
         const section = this.getSection('script', /(\r|\n|\t)/g)
 
@@ -34,7 +32,7 @@ export default class PropsAnalyser extends ModuleAnalyser {
                 depth--
 
                 if(depth == 1) {
-                    table.updateRowByObject(this.propToOptions(prop, options), 'Prop')
+                    table.updateRowByObject(this.propToOptions(prop, options))
                     prop = ""
                     options = ""
                 }

@@ -5,7 +5,6 @@ export default class ModuleAnalyzer {
     file: string
     moduleName: string
     moduleTable: Table
-    moduleKey: string = ""
 
     constructor(file: string, moduleName: string) {
         this.file = file
@@ -23,7 +22,7 @@ export default class ModuleAnalyzer {
         if(readmeTable.isEmpty()) return readme
 
         if(readmeTable != this.moduleTable)
-            readmeTable.merge(this.moduleTable, this.moduleKey)
+            readmeTable.merge(this.moduleTable)
 
         return readmeTable.replaceInReadme(readme)
     }

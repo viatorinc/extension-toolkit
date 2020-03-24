@@ -5,8 +5,6 @@ import { wrapText } from '../../util/util'
 export default class CssAnalyser extends ModuleAnalyser {
 
     read(): Table {
-        this.moduleKey = 'Variable'
-
         const table = new Table('CSS Variables', ['Variable', 'Default'], [])
         const section = this.getSection('style', /a^/)
         if(!section) return table
@@ -18,7 +16,7 @@ export default class CssAnalyser extends ModuleAnalyser {
             table.updateRowByObject({
                 Variable: wrapText(name, '`'),
                 Default: wrapText(value, '`')
-            }, 'Variable')
+            })
         });
 
         return table

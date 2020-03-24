@@ -7,7 +7,7 @@
     "directus-toolkit": "./bin/index.js"
   },
   "scripts": {
-    "start": "nodemon --watch 'cli/**/*.ts' --exec ts-node cli/index.ts",
+    "start": "nodemon --watch src --exec npm run build -e js,ts,json",
     "create": "npm run build && npm run test",
     "build": "tsc -p .",
     "test": "npm i -g && directus-toolkit",

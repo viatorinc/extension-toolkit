@@ -18,15 +18,14 @@ export default class ModuleAnalyzer {
     }
 
     merge(readme: string): string {
-        const readmeTable = Table.getTable(readme, this.moduleTable.name)
-        // console.log(`Table of ${this.moduleName} before: `, readmeTable);
-        
-        if(readmeTable) {
+        let readmeTable = Table.getTable(readme, this.moduleTable.name) || this.moduleTable
+
+        if(readmeTable.isEmpty()) return readme
+
+        if(readmeTable != this.moduleTable)
             readmeTable.merge(this.moduleTable, this.moduleKey)
-            // console.log(`Table of ${this.moduleName} after: `, readmeTable);
-            return readmeTable.replaceInReadme(readme)
-        }
-        return readme   
+
+        return readmeTable.replaceInReadme(readme)
     }
 
     getSection(section: string, ignore: RegExp): string | null {

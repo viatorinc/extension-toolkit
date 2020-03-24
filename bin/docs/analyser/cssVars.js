@@ -18,6 +18,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var analyser_1 = __importDefault(require("../analyser"));
 var table_1 = __importDefault(require("../table"));
+var util_1 = require("../../util/util");
 var CssAnalyser = /** @class */ (function (_super) {
     __extends(CssAnalyser, _super);
     function CssAnalyser() {
@@ -26,7 +27,7 @@ var CssAnalyser = /** @class */ (function (_super) {
     CssAnalyser.prototype.read = function () {
         this.moduleKey = 'Variable';
         var table = new table_1.default('CSS Variables', ['Variable', 'Default'], []);
-        var section = this.getSection('script', /a^/);
+        var section = this.getSection('style', /a^/);
         if (!section)
             return table;
         var cssVars = section.match(new RegExp("^\t?(--" + this.moduleName + ".*?: .*?;)+?", 'gm'));
@@ -35,8 +36,8 @@ var CssAnalyser = /** @class */ (function (_super) {
         cssVars.forEach(function (variable) {
             var _a = variable.replace(/(\t|;)/g, '').split(': '), name = _a[0], value = _a[1];
             table.updateRowByObject({
-                Variable: name,
-                Default: value
+                Variable: util_1.wrapText(name, '`'),
+                Default: util_1.wrapText(value, '`')
             }, 'Variable');
         });
         return table;

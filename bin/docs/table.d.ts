@@ -13,6 +13,7 @@ export default class Table {
     updateRowByArray(newRow: string[]): void;
     hideNoneExistingRows(existingRows: string[]): void;
     merge(table: Table, keyColumn: string): void;
+    isEmpty(): boolean;
     generateTableString(): string;
     calcColumnSizes(): void;
     static getTable: (text: string, name: string) => Table | null;

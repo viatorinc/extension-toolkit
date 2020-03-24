@@ -1,6 +1,6 @@
 import ModuleAnalyser from '../analyser'
 import Table from '../table'
-import { camelToSnake, wrapText } from '../../util/util'
+import { wrapText } from '../../util/util'
 
 export default class CssAnalyser extends ModuleAnalyser {
 
@@ -8,7 +8,7 @@ export default class CssAnalyser extends ModuleAnalyser {
         this.moduleKey = 'Variable'
 
         const table = new Table('CSS Variables', ['Variable', 'Default'], [])
-        const section = this.getSection('script', /a^/)
+        const section = this.getSection('style', /a^/)
         if(!section) return table
         const cssVars = section.match(new RegExp(`^\t?(--${this.moduleName}.*?: .*?;)+?`, 'gm'))
         if( !cssVars) return table
@@ -16,8 +16,8 @@ export default class CssAnalyser extends ModuleAnalyser {
         cssVars.forEach(variable => {
             const [name, value] = variable.replace(/(\t|;)/g, '').split(': ')
             table.updateRowByObject({
-                Variable: name,
-                Default: value
+                Variable: wrapText(name, '`'),
+                Default: wrapText(value, '`')
             }, 'Variable')
         });
 

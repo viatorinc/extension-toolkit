@@ -49,6 +49,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var analyser_1 = __importDefault(require("./analyser"));
+var util_1 = require("../util/util");
 exports.docs = function (folders) {
     return __awaiter(this, void 0, void 0, function () {
         var allowedFolders, analysers, folderList, analyserFiles, i, analyser;
@@ -83,8 +84,11 @@ exports.docs = function (folders) {
                     return [3 /*break*/, 1];
                 case 4:
                     folderList.forEach(function (folder) {
-                        var elements = fs_1.default.readdirSync('./src/' + folder).filter(function (dir) { return !dir.match(/\..*?$/); });
-                        elements.forEach(function (element) { return createDocs(folder, element, analysers); });
+                        var modules = fs_1.default.readdirSync('./src/' + folder).filter(function (dir) { return !dir.match(/\..*?$/); });
+                        modules.forEach(function (module) {
+                            console.log(util_1.createHeader(module, 36));
+                            createDocs(folder, module, analysers);
+                        });
                     });
                     return [2 /*return*/];
             }
@@ -97,10 +101,7 @@ function createDocs(folder, moduleName, analysers) {
     var readmeFile = path_1.default.join(folderLocation, 'readme.md');
     var newReadmeFile = path_1.default.join(folderLocation, 'new-readme.md');
     if (!fs_1.default.existsSync(vueFile)) {
-        return console.log("No Element detected: ", moduleName);
-    }
-    else {
-        console.log("Element got detected: ", moduleName);
+        return console.log("No Module detected!");
     }
     var file = fs_1.default.readFileSync(vueFile).toString('utf8');
     if (!fs_1.default.existsSync(readmeFile)) {

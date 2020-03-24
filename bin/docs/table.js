@@ -49,7 +49,7 @@ var Table = /** @class */ (function () {
             Object.entries(newRow).forEach(function (entry) {
                 var key = entry[0], value = entry[1];
                 var i = _this.columns.indexOf(key);
-                if (i != -1) {
+                if (i != -1 && value != '') {
                     _this.rows[row][i] = value;
                     _this.changed = true;
                 }
@@ -110,9 +110,14 @@ var Table = /** @class */ (function () {
         table.columns.forEach(function (column) { return _this.updateColumn(column); });
         var columnIndex = this.columns.indexOf(keyColumn);
         table.rows.forEach(function (row) {
-            _this.updateRowByArray(row);
+            var rowObject = {};
+            row.forEach(function (field, index) { return rowObject[table.columns[index]] = field; });
+            _this.updateRowByObject(rowObject, keyColumn);
         });
         this.hideNoneExistingRows(table.rows.map(function (row) { return row[columnIndex]; }));
+    };
+    Table.prototype.isEmpty = function () {
+        return this.rows.length == 0;
     };
     Table.prototype.generateTableString = function () {
         var _this = this;
@@ -146,7 +151,7 @@ var Table = /** @class */ (function () {
         this.columnSizes = tableTransposed.map(function (column) { return Math.max.apply(Math, column); });
     };
     Table.prototype.replaceInReadme = function (readme) {
-        var regex = new RegExp("## " + this.name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm');
+        var regex = new RegExp("## " + this.name + "\\s*?\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm');
         var match = readme.match(regex);
         if (match) {
             readme = readme.replace(regex, this.generateTableString());
@@ -157,14 +162,14 @@ var Table = /** @class */ (function () {
         return readme;
     };
     Table.getTable = function (text, name) {
-        var table = text.match(new RegExp("## " + name + "\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm'));
+        var table = text.match(new RegExp("## " + name + "\\s*?\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)", 'm'));
         var tableString = "";
         if (!table) {
             console.log("No Table with name " + name + " detected");
             return null;
         }
         else {
-            tableString = table[0];
+            tableString = table[0].replace(/^\s*/gm, '');
         }
         var lines = tableString.replace(/\n$/g, '').split('\n'); // remove last newline and split at each other newline
         var columns = lines[1].replace(/(^\||\|$)/g, '').split('|').map(function (column) { return column.replace(/\s+/g, ' ').replace(/(^ | $)/g, ''); });

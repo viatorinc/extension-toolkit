@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path'
 import Table from './table'
 import ModuleAnalyser from './analyser'
+import { createHeader } from '../util/util'
 
 export const docs = async function(folders: string) {
 
@@ -32,8 +33,11 @@ export const docs = async function(folders: string) {
     }
 
     folderList.forEach(folder => {
-        let elements = fs.readdirSync('./src/'+ folder).filter(dir => !dir.match(/\..*?$/))
-        elements.forEach(element => createDocs(folder, element, analysers))
+        let modules = fs.readdirSync('./src/'+ folder).filter(dir => !dir.match(/\..*?$/))
+        modules.forEach(module => {
+            console.log(createHeader(module, 36));
+            createDocs(folder, module, analysers)
+        })
         
     })
 }
@@ -45,9 +49,7 @@ function createDocs(folder: string, moduleName: string, analysers: typeof Module
     const newReadmeFile = path.join(folderLocation, 'new-readme.md')
 
     if(!fs.existsSync(vueFile)) {
-        return console.log("No Element detected: ", moduleName);
-    } else {
-        console.log("Element got detected: ", moduleName);
+        return console.log("No Module detected!");
     }
 
     let file = fs.readFileSync(vueFile).toString('utf8')

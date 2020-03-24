@@ -43,7 +43,7 @@ export default class Table {
             Object.entries(newRow).forEach(entry => {
                 const [key, value] = entry
                 let i = this.columns.indexOf(key)
-                if(i != -1) {
+                if(i != -1 && value != '') {
                     this.rows[row][i] = value
                     this.changed = true
                 }
@@ -108,10 +108,16 @@ export default class Table {
         const columnIndex = this.columns.indexOf(keyColumn)
 
         table.rows.forEach(row => {
-            this.updateRowByArray(row)
+            let rowObject: {[key: string]: string} = {}
+            row.forEach((field, index) => rowObject[table.columns[index]] = field)
+            this.updateRowByObject(rowObject, keyColumn)
         })
 
         this.hideNoneExistingRows(table.rows.map(row => row[columnIndex]))
+    }
+
+    isEmpty(): boolean {
+        return this.rows.length == 0
     }
     
     generateTableString() {
@@ -151,14 +157,14 @@ export default class Table {
 
     static getTable = function(text: string, name: string): Table | null {
     
-        let table = text.match(new RegExp(`## ${name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m'))
+        let table = text.match(new RegExp(`## ${name}\\s*?\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m'))
         let tableString = ""
         
         if(!table) {
             console.log(`No Table with name ${name} detected`);
             return null
         } else {
-            tableString = table[0]
+            tableString = table[0].replace(/^\s*/gm, '')
         }
     
         let lines = tableString.replace(/\n$/g, '').split('\n') // remove last newline and split at each other newline
@@ -173,13 +179,15 @@ export default class Table {
     }
 
     replaceInReadme(readme: string): string {
-        const regex = new RegExp(`## ${this.name}\\s\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m')
+        const regex = new RegExp(`## ${this.name}\\s*?\\|(.*?\\|\\s\\|.*?){1,}\\|(\\n|$)`,'m')
         let match = readme.match(regex)
+
         if(match) {
             readme = readme.replace(regex, this.generateTableString())
         } else {
             readme += "\n" + this.generateTableString()
         }
+        
         return readme
     }
 }

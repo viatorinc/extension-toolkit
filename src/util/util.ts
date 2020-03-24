@@ -5,3 +5,11 @@ export function camelToSnake(name: string): string {
 export function wrapText(text: string, wrapper: string): string {
     return wrapper + text + wrapper
 }
+
+export function createHeader(title: string, length: number) {
+    let left = Math.floor((length - title.length) / 2 + 4)
+    let right = Math.ceil((length - title.length) / 2 + 4)
+    left = left < 2 ? 2 : left
+    right = right < 2 ? 2 : right
+    return "-".repeat(left) +"[ "+title+" ]"+"-".repeat(right)
+}

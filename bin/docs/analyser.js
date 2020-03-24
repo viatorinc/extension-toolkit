@@ -15,14 +15,12 @@ var ModuleAnalyzer = /** @class */ (function () {
         return new table_1.default('', [], []);
     };
     ModuleAnalyzer.prototype.merge = function (readme) {
-        var readmeTable = table_1.default.getTable(readme, this.moduleTable.name);
-        // console.log(`Table of ${this.moduleName} before: `, readmeTable);
-        if (readmeTable) {
+        var readmeTable = table_1.default.getTable(readme, this.moduleTable.name) || this.moduleTable;
+        if (readmeTable.isEmpty())
+            return readme;
+        if (readmeTable != this.moduleTable)
             readmeTable.merge(this.moduleTable, this.moduleKey);
-            // console.log(`Table of ${this.moduleName} after: `, readmeTable);
-            return readmeTable.replaceInReadme(readme);
-        }
-        return readme;
+        return readmeTable.replaceInReadme(readme);
     };
     ModuleAnalyzer.prototype.getSection = function (section, ignore) {
         var formattedfile = this.file.replace(ignore, '');

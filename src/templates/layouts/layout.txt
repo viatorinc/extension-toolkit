@@ -1,0 +1,27 @@
+<%= name %>.vue
+<template>
+	<div class="<%= nameSnake %>">
+</template>
+
+<script lang="ts">
+import { defineComponent, ref } from '@vue/composition-api';
+
+export default defineComponent({
+	props: {
+		collection: {
+			type: String,
+			required: true
+		}
+	},
+	setup(props) {
+
+		return {}
+	}
+});
+</script>
+
+<style lang="scss" scoped>
+.<%= nameSnake %> {
+    
+}
+</style>

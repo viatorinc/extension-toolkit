@@ -1,0 +1,12 @@
+index.ts
+import { defineLayout } from '@/layouts/define';
+import <%= nameCamelFull %> from './<%= nameSnake %>';
+
+export default defineLayout({
+	id: '<%= nameSnake %>',
+	register: ({ i18n }) => ({
+		name: i18n.t('layouts.<%= nameSnake %>.<%= nameSnake %>'),
+		icon: 'table',
+		component: <%= nameCamelFull %>
+	})
+});

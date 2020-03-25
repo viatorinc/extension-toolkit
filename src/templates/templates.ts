@@ -1,36 +1,48 @@
 import fs from 'fs';
 import path from 'path'
 import ejs from 'ejs'
+import * as util from '../util/util'
 
-export default async function(type: string, name: string) {
+export default function(type: string, name: string) {
     
     const templateFolders = fs.readdirSync(__dirname).filter(dir => !dir.match(/\./g))
     if(!templateFolders.includes(type)) {
         return console.log(`The given type does not exist. Possible types: ${templateFolders.join(', ')}`);
     }
 
-    if(fs.existsSync(path.join('./src', type, name))) return console.log("The name already exists, please choose another name.");
+    if(fs.existsSync(path.join('src', type, name))) return console.log("The name already exists, please choose another name.");
 
     const files = fs.readdirSync(path.join(__dirname, type)).filter(dir => dir.match(/.txt$/gm))
     fs.mkdirSync(path.join('src', type, name))
 
-    await delay(1000)
+    console.log("Docs have been generated");
+    
 
-    files.forEach( file => {
+    files.forEach( async file => {
         const fileContent = fs.readFileSync(path.join(__dirname, type, file)).toString('utf8').split('\n')
-        const fileName = fileContent.shift() || ''
+        const parserPath = path.join(__dirname, type, file.replace('.txt', '.js'))
+        let data: {[key: string]: string} = {}
+        if(fs.existsSync(parserPath)) {
+            const parser = <Function> (await import(parserPath)).default
+            
+            if(parser instanceof Function && parser.name == 'parser') {
+                data = parser(name) || {}
+            }
+        }
+
+        let fileName = fileContent.shift() || ''
+        fileName = ejs.render(fileName, {name}).replace(/\s/g, '')
         const content = fileContent.join('\n')
-        console.log("Path: ", path.join('src', type, name, ejs.render(fileName, {name})));
+
+        data.name = util.snakeToTitle(name)
+        data.type = type
+        data.nameSnake = name
+        data.nameCamel = util.snakeToCamel(name)
+        data.nameCamelFull = util.snakeToCamel('-'+name)
         
-        console.log("Exists: ", fs.existsSync(path.join('src', type, name)));
-        
-        fs.writeFile(path.join('src', type, name, ejs.render(fileName, {name}))+".txt", ejs.render(content) + "A", (err) =>{
+        fs.writeFile(path.join('src', type, name, fileName), ejs.render(content, data), (err) =>{
             if(err) console.error(err);
         })
     })
     
-}
-
-function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
 }

@@ -13,7 +13,7 @@ export default class SlotsAnalyser extends ModuleAnalyser {
 
         slots.forEach(slot => {
             const nameMatch = slot.match(/name="(.*?)"/)         
-            const name = nameMatch? nameMatch[1] : '_default_'
+            const name = nameMatch? wrapText(nameMatch[1], '`') : '_default_'
             const dataMatch = slot.match(/v-bind="(.*?)"/)
             const data = dataMatch? dataMatch[1] : ''
 

@@ -1,33 +1,37 @@
-<%= name %>.ts
-import {{ withKnobs, {4} }} from '@storybook/addon-knobs';
-import {{ action }} from '@storybook/addon-actions';
+<%= name %>story.ts
+import { withKnobs, text, number, boolean } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
 import Vue from 'vue';
-import Interface{2} from './{0}.vue';
+import Interface<%= nameCamelFull %> from './<%= nameSnake %>.vue';
 import markdown from './readme.md';
 import withPadding from '../../../.storybook/decorators/with-padding';
-import {{ defineComponent }} from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
 
-Vue.component('interface-{0}', Interface{2});
+Vue.component('interface-<%= nameSnake %>', Interface<%= nameCamelFull %>);
 
-export default {{
-	title: 'Interfaces / {1}',
+export default {
+	title: 'Interfaces / <%= name %>',
 	decorators: [withKnobs, withPadding],
-	parameters: {{
+	parameters: {
 		notes: markdown
-	}}
-}};
+	}
+};
 
 export const basic = () =>
-	defineComponent({{
-		props: {3},
-		setup() {{
+	defineComponent({
+		props: {
+			value: {
+				default: text('Value', 'Default Value')
+			}
+		},
+		setup() {
 			const onInput = action('input');
-			return {{ onInput }};
-		}},
+			return { onInput };
+		},
 		template: `
-            <interface-checkbox
-{5}
+            <interface-<%= nameSnake %>
+				:value="value"
 				@input="onInput"
 			/>
 		`
-	}});
+	});

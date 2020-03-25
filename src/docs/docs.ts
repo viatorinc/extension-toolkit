@@ -4,17 +4,17 @@ import Table from './table'
 import ModuleAnalyser from './analyser'
 import { createHeader } from '../util/util'
 
-export default async function(folders: string) {
+export default async function(type: string, moduleName?: string) {
 
-    const allowedFolders = ['all', 'interfaces', 'components']
+    const allowedTypes = ['all', 'interfaces', 'components']
     const analysers: typeof ModuleAnalyser[] = []
 
-    if(allowedFolders.includes(folders) == false) {
-        return console.log("Invalid folder!")
+    if(allowedTypes.includes(type) == false) {
+        return console.log(`Invalid type! Allowed: ${allowedTypes.join(', ')}`)
     }
 
-    allowedFolders.shift()
-    const folderList = folders == 'all' ? allowedFolders : [folders]
+    allowedTypes.shift()
+    const folderList = type == 'all' ? allowedTypes : [type]
 
     const analyserFiles = fs.readdirSync(path.join(__dirname, 'analyser')).filter(dir => dir.match(/.*?\.js$/))
 
@@ -33,7 +33,15 @@ export default async function(folders: string) {
     }
 
     folderList.forEach(folder => {
-        let modules = fs.readdirSync('./src/'+ folder).filter(dir => !dir.match(/\..*?$/))
+        let modules = fs.readdirSync(path.join('src', folder)).filter(dir => !dir.match(/\..*?$/))
+
+        if(moduleName) {
+            modules = modules.filter(module => module == moduleName)
+        }
+        if(modules.length == 0) {
+            return console.log("The module could not be found");
+        }
+
         modules.forEach(module => {
             console.log(createHeader(module, 36));
             createDocs(folder, module, analysers)
@@ -46,7 +54,6 @@ function createDocs(folder: string, moduleName: string, analysers: typeof Module
     const folderLocation = path.join('src', folder, moduleName)
     const vueFile = path.join(folderLocation, moduleName + '.vue')
     const readmeFile = path.join(folderLocation, 'readme.md')
-    const newReadmeFile = path.join(folderLocation, 'new-readme.md')
 
     if(!fs.existsSync(vueFile)) {
         return console.log("No Module detected!");
@@ -71,11 +78,11 @@ function createDocs(folder: string, moduleName: string, analysers: typeof Module
             changes.push(analyser.moduleTable.name)
     })
 
-    if(fs.existsSync(newReadmeFile)) {
-        fs.unlinkSync(newReadmeFile)
+    if(fs.existsSync(readmeFile)) {
+        fs.unlinkSync(readmeFile)
     }
 
     if(changes.length > 0)console.log(`${moduleName}: Changes for ${changes.join(', ')}`);
 
-    fs.writeFileSync(newReadmeFile, readme)
+    fs.writeFile(readmeFile, readme, (err) => {if(err)console.error(err)})
 }

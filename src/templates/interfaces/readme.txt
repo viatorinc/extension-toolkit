@@ -1,14 +1,11 @@
 readme.md
-# {1}
-This is a template for the {0} interface
+# <%= name %>
+This is a template for the <%= name %> interface
 
 ## Basic usage
 
 ```html
-<interface type="{0}"/>
+<div />
 ```
 
-## Props
-| Prop            | Description                                        | Default |
-|-----------------|----------------------------------------------------|---------|
-{2}
+<!-- To generate all tables, please run 'directus-toolkit docs <%= type %> <%= nameSnake %>' -->

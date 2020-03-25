@@ -1,23 +1,30 @@
 <%= name %>.vue
 <template>
-	<v-{0}>
-    </v-{0}>
+	<div class="<%= nameSnake %>">
+    </div>
 </template>
-
 <script lang="ts">
-import {{ defineComponent, PropType, ref }} from '@vue/composition-api';
+import { defineComponent, PropType, ref } from '@vue/composition-api';
 
-export default defineComponent({{
-	props: {1},
-	setup(props, {{ emit }}) {{
+export default defineComponent({
+	props: {
+		value: {
+			type: String,
+			default: ''
+		}
+	},
+	setup(props, { emit }) {
 
-		function onChange(event: boolean) {{
+		function onChange(event: boolean) {
 			emit('input', event);
-		}}
+		}
 
-		return {{ onChange }};
-	}}
-}});
+		return { onChange };
+	}
+});
 </script>
 <style lang="scss" scoped>
+.<%= nameSnake %> {
+
+}
 </style>

@@ -14,17 +14,17 @@ To update documentaton (readmes) of any module, run `directus-toolkit docs [type
 
 To update the button component:
 ```
-directus-extensions docs components v-button
+directus-toolkit docs components v-button
 ```
 
 To update every module:
 ```
-directus-extensions docs
+directus-toolkit docs
 ```
 
 To create a new extension, run `directus-toolkit templates <type> <name>`.
 Run this command in the root directory.
 
 ```
-directus-extensions templates interfaces my-first-interface
+directus-toolkit templates interfaces my-first-interface
 ```

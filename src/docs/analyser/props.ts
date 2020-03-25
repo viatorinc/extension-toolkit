@@ -6,7 +6,7 @@ export default class PropsAnalyser extends ModuleAnalyser {
 
     read(): Table {
         const table = new Table('Props', ['Prop', 'Description', 'Default', 'Type'], [])
-        const section = this.getSection('script', /(\r|\n|\t)/g)
+        const section = this.getSection('script', /(\r|\t)/g)
 
         if(!section) {
             return table
@@ -48,8 +48,13 @@ export default class PropsAnalyser extends ModuleAnalyser {
 
         let options: {[key: string]: string} = {Prop: prop}
 
-        optionsString.split(/,\n/g).forEach(option => {
-            let [name, value] = option.split(': ')
+        console.log(optionsString);
+        
+        console.log(optionsString.split(/,(\t|\r| )*?\n/g));
+        
+
+        optionsString.split(/, *?\n/g).forEach(option => {
+            let [name, value] = option.replace(/\n/g,'').split(': ')
             console.log(name, value);
             
 

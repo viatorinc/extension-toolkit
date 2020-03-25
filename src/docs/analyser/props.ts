@@ -48,8 +48,10 @@ export default class PropsAnalyser extends ModuleAnalyser {
 
         let options: {[key: string]: string} = {Prop: prop}
 
-        optionsString.split(',').forEach(option => {
+        optionsString.split(/,\n/g).forEach(option => {
             let [name, value] = option.split(': ')
+            console.log(name, value);
+            
 
             if(name == 'required' && value == 'true') {
                 options.Prop += '*'

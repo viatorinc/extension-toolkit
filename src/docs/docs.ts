@@ -4,7 +4,7 @@ import Table from './table'
 import ModuleAnalyser from './analyser'
 import { createHeader } from '../util/util'
 
-export const docs = async function(folders: string) {
+export default async function(folders: string) {
 
     const allowedFolders = ['all', 'interfaces', 'components']
     const analysers: typeof ModuleAnalyser[] = []

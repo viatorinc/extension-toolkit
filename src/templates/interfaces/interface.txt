@@ -1,3 +1,4 @@
+<%= name %>.vue
 <template>
 	<v-{0}>
     </v-{0}>

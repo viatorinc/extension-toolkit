@@ -7,9 +7,9 @@
     "directus-toolkit": "./bin/index.js"
   },
   "scripts": {
-    "start": "nodemon --watch src --exec npm run build -e js,ts,json",
+    "start": "nodemon --watch src --exec npm run build -e js,ts,json,txt",
     "create": "npm run build && npm run test",
-    "build": "tsc -p .",
+    "build": "tsc -p . && copyfiles -u 1 ./src/**/*.txt ./bin",
     "test": "npm i -g && directus-toolkit",
     "refresh": "rm -rf ./node_modules ./package-lock.json && npm install"
   },
@@ -42,11 +42,12 @@
   },
   "devDependencies": {
     "@types/clear": "^0.1.0",
+    "@types/ejs": "^3.0.1",
     "@types/figlet": "^1.2.0",
     "@types/node": "^13.9.3",
-    "@types/yargs": "^15.0.4",
     "nodemon": "^2.0.2",
     "ts-node": "^8.8.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "copyfiles": "^2.2.0"
   }
 }

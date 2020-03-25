@@ -1,3 +1,4 @@
+<%= name %>.ts
 import VueCompositionAPI from '@vue/composition-api';
 import {{ shallowMount, createLocalVue }} from '@vue/test-utils';
 import Interface{1} from './{0}.vue';

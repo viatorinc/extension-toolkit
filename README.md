@@ -1,4 +1,4 @@
-# extension-toolkit
+# Directus Toolkit
 [WIP] Toolkit to help you build your own custom extensions!
 
 ## Installation

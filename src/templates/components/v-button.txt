@@ -1,0 +1,26 @@
+<%= nameSnake %>.vue
+<template>
+	<div class="<%= nameSnake %>"></div>
+</template>
+
+<script lang="ts">
+import { defineComponent, computed, PropType } from '@vue/composition-api';
+
+export default defineComponent({
+	props: {
+		value: {
+			type: String,
+			default: ''
+		},
+	},
+	setup(props, { emit }) {
+		
+		return {}
+	}
+});
+</script>
+
+<style lang="scss" scoped>
+.<%= nameSnake %> {
+}
+</style>

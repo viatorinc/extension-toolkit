@@ -1,0 +1,36 @@
+<%= name %>.story.ts
+import { withKnobs, text, boolean, number } from '@storybook/addon-knobs';
+import { action } from '@storybook/addon-actions';
+import Vue from 'vue';
+import <%= nameCamelFull %> from './v-button.vue';
+import markdown from './readme.md';
+import withPadding from '../../../.storybook/decorators/with-padding';
+
+Vue.component('<%= nameSnake %>', <%= nameCamelFull %>);
+
+const router = new VueRouter();
+
+export default {
+	title: 'Components / <%= name %>',
+	component: <%= nameCamelFull %>,
+	decorators: [withKnobs, withPadding],
+	parameters: {
+		notes: markdown
+	}
+};
+
+export const withText = () => ({
+	methods: { onClick: action('click') },
+	props: {
+		value: {
+			default: text('Value', 'Default Value')
+		}
+	},
+	template: `
+		<<%= nameSnake %>
+			:value="value"
+			@click="onClick"
+		>
+		</<%= nameSnake %>>
+	`
+});

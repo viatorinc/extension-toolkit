@@ -1,0 +1,18 @@
+<%= name %>.test.ts
+import { mount, createLocalVue } from '@vue/test-utils';
+import VueCompositionAPI from '@vue/composition-api';
+import VueRouter from 'vue-router';
+import router from '@/router';
+import <%= nameCamelFull %> from './<%= nameSnake %>.vue';
+
+const localVue = createLocalVue();
+
+describe('<%= name %>', () => {
+	it('Renders the provided markup in the default slow', () => {
+		const component = mount(<%= nameCamelFull %>, {
+			localVue,
+		});
+
+		expect(component.text()).toContain('...');
+	});
+});

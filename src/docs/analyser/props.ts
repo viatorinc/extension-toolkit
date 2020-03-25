@@ -55,6 +55,7 @@ export default class PropsAnalyser extends ModuleAnalyser {
                 options.Prop += '*'
             } else {
                 name = name.replace(/^./, g => g.toUpperCase())
+                value = value.replace(/\|/g, 'or')
                 options[name] = wrapText(value, '`')
             }
         })

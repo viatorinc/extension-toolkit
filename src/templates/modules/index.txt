@@ -1,0 +1,18 @@
+index.ts
+import { defineModule } from '@/modules/define';
+import <%= nameCamelFull %> from './<%= nameSnake %>';
+
+export default defineModule({
+	id: '<%= nameSnake %>',
+	register: ({ i18n }) => ({
+		name: i18n.tc('<%= nameSnake %>', 2),
+		routes: [
+			{
+				name: '<%= nameSnake %>-main',
+				path: '/',
+				component: <%= nameSnake %>
+			},
+		],
+		icon: 'box'
+	})
+});

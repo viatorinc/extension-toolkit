@@ -11,7 +11,7 @@ console.log(figlet.textSync('Toolkit', {horizontalLayout: 'full', font: 'Doom'} 
 
 program.version('0.0.1').description("Do some cool stuff and save some time developing with directus!")
 
-program.command("docs").arguments("<type> [module]").description('Do the Docs!').action(docs)
+program.command("docs").arguments("[type] [name]").description('Do the Docs!').action(docs)
 
 program.command("template").arguments("<type> <name>").description('Create the Templates!').action(template)
   

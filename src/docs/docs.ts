@@ -4,17 +4,18 @@ import Table from './table'
 import ModuleAnalyser from './analyser'
 import { createHeader } from '../util/util'
 
-export default async function(type: string, moduleName?: string) {
+export default async function(type?: string, name?: string) {
 
-    const allowedTypes = ['all', 'interfaces', 'components']
+    let allowedTypes = ['interfaces', 'components']
     const analysers: typeof ModuleAnalyser[] = []
 
-    if(allowedTypes.includes(type) == false) {
-        return console.log(`Invalid type! Allowed: ${allowedTypes.join(', ')}`)
-    }
+    if(type) {
+        if(allowedTypes.includes(type) == false) {
+            return console.log(`Invalid type! Allowed: ${allowedTypes.join(', ')}`)
+        }
 
-    allowedTypes.shift()
-    const folderList = type == 'all' ? allowedTypes : [type]
+        allowedTypes = [type]
+    }
 
     const analyserFiles = fs.readdirSync(path.join(__dirname, 'analyser')).filter(dir => dir.match(/.*?\.js$/))
 
@@ -32,11 +33,11 @@ export default async function(type: string, moduleName?: string) {
         })
     }
 
-    folderList.forEach(folder => {
+    allowedTypes.forEach(folder => {
         let modules = fs.readdirSync(path.join('src', folder)).filter(dir => !dir.match(/\..*?$/))
 
-        if(moduleName) {
-            modules = modules.filter(module => module == moduleName)
+        if(name) {
+            modules = modules.filter(module => module == name)
         }
         if(modules.length == 0) {
             return console.log("The module could not be found");

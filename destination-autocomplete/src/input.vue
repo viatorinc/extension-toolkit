@@ -6,7 +6,7 @@
                   input-class="autocomplete-input">
     </autocomplete>
     
-    <input :value="formattedValue"/>
+    <input :value="formattedValue" class="max-width"/>
   </div>
 </template>
 
@@ -51,5 +51,8 @@
 <style>
   .autocomplete-input {
     min-width: 200px;
+  }
+  .max-width {
+    width: 100%;
   }
 </style>

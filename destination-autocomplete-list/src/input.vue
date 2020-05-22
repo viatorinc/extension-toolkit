@@ -1,13 +1,14 @@
 <template>
-<div>
+    <div>
     <autocomplete v-on:selected="handleSelected"
                   :source="tags"
                   :resultsFormatter='formatResults'
                   input-class="autocomplete-input">
     </autocomplete>
-    
-    <input :value="formattedValue"/>
+    <div>
+    <input v-model="formattedList" @change="onChange($event)" class="max-width"/>
   </div>
+    </div>
 </template>
 
 <script>
@@ -25,11 +26,11 @@
       }
     },
     computed: {
-      formattedValue: function() {
+      formattedList: function() {
         if(this.value == null) {
           return;
         }
-        return this.value.split('|')[1];
+        return this.value.split(',').map(v => v.split('|')[1]);
       }
     },
     async mounted() {
@@ -39,17 +40,27 @@
     },
     methods: {
         handleSelected: function(selected) {
-            const value = `${selected.selectedObject.id}|${selected.selectedObject.name}`;
+            const value = "".concat(`${this.value},`).concat(`${selected.selectedObject.id}|${selected.selectedObject.name}`);
             this.$emit("input", value);
       },
       formatResults: (res) => {
         console.warn(res);
-      }
+      },
+      onChange: function(event)  {
+        this.value = this.value.split(',').filter(function(item) {
+            const destinationName = item.split('|')[1];
+            return event.target.value.includes(destinationName);
+        }).toString();
+        this.$emit("input", this.value);
+		  }
     }
   }
 </script>
 <style>
   .autocomplete-input {
     min-width: 200px;
+  }
+  .max-width {
+    width: 100%;
   }
 </style>

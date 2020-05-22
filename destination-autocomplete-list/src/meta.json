@@ -1,0 +1,7 @@
+{
+  "name": "destination-autocomplete-list",
+  "version": "1.0.0",
+  "icon": "list_alt",
+  "types": ["string"],
+  "options": {}
+}

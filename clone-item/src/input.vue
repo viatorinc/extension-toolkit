@@ -9,34 +9,26 @@
   import mixin from '@directus/extension-toolkit/mixins/interface';
   import { get, omit } from 'lodash';
 
-  const ARTICLES_COLLECTION_NAME = 'articles';
-  const ARTICLES_SECTIONS_COLLECTION_NAME = 'articles_sections';
-  const ARTICLES_SECTIONS_TRANSLATIONS_COLLECTION_NAME = 'articles_sections_translations';
-  const ARTICLES_TRANSLATIONS_COLLECTION_NAME = 'articles_translations';
-
   const ITEM_FIELDS_NOT_TO_CLONE = [
-      'id',
-      'created_by',
-      'created_on',
-      'modified_by',
-      'modified_on',
+    'id',
+    'created_by',
+    'created_on',
+    'modified_by',
+    'modified_on',
+    'status',
+    'author',
+    'publish_date',
+    'deactivate_date',
+    'search_engine_index_on',
+    'destination_id',
+    'tags',
+    'content_translations',
+    'sections'
   ];
-  const ARTICLE_FIELDS_NOT_TO_CLONE = [
-      ...ITEM_FIELDS_NOT_TO_CLONE,
-      'status',
-      'author',
-      'publish_date',
-      'deactivate_date',
-      'search_engine_index_on',
-      'destination_id',
-      'tags',
-      'content_translations',
-      'sections'
-  ];
-  const ARTICLE_SECTION_FIELDS_NOT_TO_CLONE = [
-      ...ITEM_FIELDS_NOT_TO_CLONE,
-      'content_translations'
-  ];
+
+  const ARTICLES_COLLECTION_NAME = 'articles';
+  const SHELF_COLLECTIONS_COLLECTION_NAME = 'shelf_collections';
+  const CLONE_SUPPORTED_COLLECTIONS = [ARTICLES_COLLECTION_NAME, SHELF_COLLECTIONS_COLLECTION_NAME];
 
   export default {
       mixins: [mixin],
@@ -51,7 +43,7 @@
             const cmsId = this.primaryKey;
             const collectionName = this.collection;
 
-            if (collectionName !== ARTICLES_COLLECTION_NAME) {
+            if (!CLONE_SUPPORTED_COLLECTIONS.includes(collectionName)) {
                 this.$notify({
                     title: this.$t('interfaces.clone-item.clone-not-supported'),
                     color: 'red',
@@ -62,17 +54,13 @@
             }
 
             this.saving = true;
-            const id = this.$helpers.shortid.generate();
-            this.$store.dispatch('loadingStart', { id });
-
-            let clonedItemId;
+            const loadingId = this.$helpers.shortid.generate();
+            this.$store.dispatch('loadingStart', { id: loadingId });
 
             try {
-                if (collectionName === ARTICLES_COLLECTION_NAME) {
-                    clonedItemId = await this._cloneArticle(cmsId);
-                }
+                const clonedItemId = await this._clone(collectionName, cmsId);
 
-                this.$store.dispatch('loadingFinished', id);
+                this.$store.dispatch('loadingFinished', loadingId);
                 this.saving = false;
 
                 this.$notify({
@@ -83,7 +71,7 @@
 
                 this.$router.push(`/${this.$store.state.currentProjectKey}/collections/${collectionName}/${clonedItemId}`);
             } catch (error) {
-                this.$store.dispatch('loadingFinished', id);
+                this.$store.dispatch('loadingFinished', loadingId);
                 this.saving = false;
 
                 this.$events.emit('error', {
@@ -92,90 +80,95 @@
                 });
             }
         },
-        async _cloneArticle(cmsId) {
-            const { data: originalArticle } = await this.$api.getItem(
-                ARTICLES_COLLECTION_NAME,
+        async _clone(itemCollectionName, cmsId) {
+            const { data: originalItem } = await this.$api.getItem(
+                itemCollectionName,
                 cmsId,
                 { fields: '*,content_translations.*' });
 
-            const { data: originalArticleSections } = await this.$api.getItems(
-                ARTICLES_SECTIONS_COLLECTION_NAME,
+            const { data: originalItemSections } = await this.$api.getItems(
+                itemCollectionName + '_sections',
                 {
                     fields: '*,content_translations.*',
                     filter: {
                         parent_id: {
-                            eq: originalArticle.id
+                            eq: originalItem.id
                         }
                     }
                 });
 
-            const clonedArticle = await this._cloneArticleItem(originalArticle);
+            const clonedItem = await this._cloneItem(
+                    itemCollectionName,
+                    originalItem);
 
-            await this._cloneArticleTranslations(originalArticle, clonedArticle);
+            await this._cloneItemTranslations(
+                    itemCollectionName,
+                    originalItem,
+                    clonedItem);
 
-            const clonedArticleSections = await this._cloneArticleSections(originalArticleSections, clonedArticle);
+            const clonedItemSections = await this._cloneSections(itemCollectionName, originalItemSections, clonedItem);
 
-            if (clonedArticleSections.length > 0) {
-                await this._cloneArticleSectionTranslations(originalArticleSections, clonedArticleSections);
+            if (clonedItemSections.length > 0) {
+                await this._cloneSectionTranslations(itemCollectionName, originalItemSections, clonedItemSections);
             }
 
-            return clonedArticle.id;
+            return clonedItem.id;
         },
-        async _cloneArticleItem(articleWithTranslations) {
-            const createArticleRequest = omit(articleWithTranslations, ARTICLE_FIELDS_NOT_TO_CLONE);
+        async _cloneItem(collectionName, original) {
+          const createRequest = omit(original, ITEM_FIELDS_NOT_TO_CLONE);
 
-            const { data: clonedArticle } = await this.$api.createItem(ARTICLES_COLLECTION_NAME, createArticleRequest);
+          const { data: clonedItem } = await this.$api.createItem(collectionName, createRequest);
 
-            return clonedArticle;
+          return clonedItem;
         },
-        async _cloneArticleTranslations(originalArticle, clonedArticle) {
-            const createArticleTranslationRequests = get(originalArticle, 'content_translations', []).map(ct => {
-                return {
-                    ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
-                    parent_id: clonedArticle.id
-                };
+        async _cloneItemTranslations(itemCollectionName, originalItem, clonedItem) {
+          const createRequests = get(originalItem, 'content_translations', []).map(ct => {
+            return {
+              ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
+              parent_id: clonedItem.id
+            };
+          });
+
+          if (createRequests.length > 0) {
+            await this.$api.createItems(itemCollectionName + '_translations', createRequests);
+          }
+        },
+        async _cloneSections(itemCollectionName, originalSections, clonedItem) {
+          const createRequests = originalSections.map(s => {
+            return {
+              ...omit(s, ITEM_FIELDS_NOT_TO_CLONE),
+              parent_id: clonedItem.id
+            };
+          });
+
+          if (createRequests.length > 0) {
+            const { data: clonedSections } = await this.$api.createItems(itemCollectionName + '_sections', createRequests);
+
+            return clonedSections;
+          }
+
+          return [];
+        },
+        async _cloneSectionTranslations(itemCollectionName, originalSections, clonedSections) {
+          const createSectionTranslationRequests = [];
+
+          originalSections.forEach((section, index) => {
+            // Get id of cloned section to use as parent id for section translation.
+            const clonedSectionId = clonedSections[index].id;
+
+            const clonedSectionTranslations = get(section, 'content_translations', []).map(ct => {
+              return {
+                ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
+                parent_id: clonedSectionId
+              };
             });
 
-            if (createArticleTranslationRequests.length > 0) {
-                await this.$api.createItems(ARTICLES_TRANSLATIONS_COLLECTION_NAME, createArticleTranslationRequests);
-            }
-        },
-        async _cloneArticleSections(originalArticleSections, clonedArticle) {
-            const createArticleSectionRequests = originalArticleSections.map(s => {
-                return {
-                    ...omit(s, ARTICLE_SECTION_FIELDS_NOT_TO_CLONE),
-                    parent_id: clonedArticle.id
-                };
-            });
+            createSectionTranslationRequests.push(...clonedSectionTranslations);
+          });
 
-            if (createArticleSectionRequests.length > 0) {
-                const { data: clonedArticleSections } = await this.$api.createItems(ARTICLES_SECTIONS_COLLECTION_NAME, createArticleSectionRequests);
-
-                return clonedArticleSections;
-            }
-
-            return [];
-        },
-        async _cloneArticleSectionTranslations(originalArticleSections, clonedArticleSections) {
-            const createArticleSectionTranslationRequests = [];
-
-            originalArticleSections.forEach((section, index) => {
-                // Get id of cloned section to use as parent id for section translation.
-                const clonedSectionId = clonedArticleSections[index].id;
-
-                const clonedSectionTranslations = get(section, 'content_translations', []).map(ct => {
-                    return {
-                        ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
-                        parent_id: clonedSectionId
-                    };
-                });
-
-                createArticleSectionTranslationRequests.push(...clonedSectionTranslations);
-            });
-
-            if (createArticleSectionTranslationRequests.length > 0) {
-                await this.$api.createItems(ARTICLES_SECTIONS_TRANSLATIONS_COLLECTION_NAME, createArticleSectionTranslationRequests);
-            }
+          if (createSectionTranslationRequests.length > 0) {
+            await this.$api.createItems(itemCollectionName + '_sections_translations', createSectionTranslationRequests);
+          }
         }
     }
   }

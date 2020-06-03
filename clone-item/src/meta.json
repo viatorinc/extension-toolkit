@@ -1,0 +1,8 @@
+{
+  "name": "Clone item",
+  "version": "1.0.0",
+  "icon": "file_copy",
+  "types": ["alias"],
+  "options": {},
+  "hideLabel": true
+}

@@ -8,9 +8,30 @@
 
 <script>
   import mixin from "@directus/extension-toolkit/mixins/interface";
-  import { get } from 'lodash';
+  import { get, omit } from 'lodash';
 
   const ARTICLES_COLLECTION_NAME = "articles";
+  const ARTICLE_TRANSLATIONS_COLLECTION_NAME = "articles_translations";
+
+  const ITEM_FIELDS_NOT_TO_CLONE = [
+      "id",
+      "created_by",
+      "created_on",
+      "modified_by",
+      "modified_on",
+  ];
+  const ARTICLE_FIELDS_NOT_TO_CLONE = [
+      ...ITEM_FIELDS_NOT_TO_CLONE,
+      "status",
+      "author",
+      "publish_date",
+      "deactivate_date",
+      "search_engine_index_on",
+      "destination_id",
+      "tags",
+      "content_translations",
+      "sections"
+  ];
 
   export default {
     mixins: [mixin],
@@ -102,26 +123,20 @@
 
             // https://docs.directus.io/guides/js-sdk.html#reference
 
-            // TODO Test if can send photos as objects with id property. Then can just delete properties instead.
-            const createArticleRequest = {
-                url: articleWithTranslations.url,
-                hero_photo_desktop_large: get(articleWithTranslations, "hero_photo_desktop_large.id", null),
-                hero_photo_desktop_small: get(articleWithTranslations, "hero_photo_desktop_small.id", null),
-                hero_photo_mobile_large: get(articleWithTranslations, "hero_photo_mobile_large.id", null),
-                hero_photo_mobile_small: get(articleWithTranslations, "hero_photo_mobile_small.id", null),
-                date: articleWithTranslations.date,
-                photo_credit: articleWithTranslations.photo_credit,
-                guide: articleWithTranslations.guide,
-                ta_location_id: articleWithTranslations.ta_location_id,
-                disclaimer: articleWithTranslations.disclaimer,
-                primary_category: articleWithTranslations.primary_category,
-                page_type: articleWithTranslations.page_type,
-            };
+            // Cloning article
+            const createArticleRequest = omit(articleWithTranslations, ARTICLE_FIELDS_NOT_TO_CLONE);
+            const { data: clonedArticle } = await this.$api.createItem(ARTICLES_COLLECTION_NAME, createArticleRequest);
 
-            // TODO Figure out why getting Error notifying NSP! when this runs
-            const clonedArticle = await this.$api.createItem(ARTICLES_COLLECTION_NAME, createArticleRequest);
+            // Cloning article translations
+            const createArticleTranslationRequests = get(articleWithTranslations, "content_translations", []).map(t => {
+                return {
+                    ...omit(t, ITEM_FIELDS_NOT_TO_CLONE),
+                    parent_id: clonedArticle.id
+                };
+            });
+            await this.$api.createItems(ARTICLE_TRANSLATIONS_COLLECTION_NAME, createArticleTranslationRequests);
 
-            const a =1;
+
         }
     }
   }

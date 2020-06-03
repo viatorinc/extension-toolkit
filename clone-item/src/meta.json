@@ -4,5 +4,12 @@
   "icon": "file_copy",
   "types": ["alias"],
   "options": {},
-  "hideLabel": true
+  "hideLabel": true,
+  "translation": {
+    "en-US": {
+      "clone": "Clone",
+      "clone-success": "Item cloned",
+      "clone-not-supported": "Item does not support cloning"
+    }
+  }
 }

@@ -1,128 +1,96 @@
 <template>
-  <v-button class="clone" :disabled="required && disabled" v-on:click="clone">
-<!--    TODO This should be from a translation in meta.json-->
-    {{ $t('Clone') }}
+  <v-button class="clone" :loading="saving" :disabled="newItem" v-on:click="clone">
+    {{ $t('interfaces.clone-item.clone') }}
     <v-icon name="file_copy" right />
   </v-button>
 </template>
 
 <script>
-  import mixin from "@directus/extension-toolkit/mixins/interface";
+  import mixin from '@directus/extension-toolkit/mixins/interface';
   import { get, omit } from 'lodash';
 
-  const ARTICLES_COLLECTION_NAME = "articles";
-  const ARTICLES_SECTIONS_COLLECTION_NAME = "articles_sections";
-  const ARTICLES_SECTIONS_TRANSLATIONS_COLLECTION_NAME = "articles_sections_translations";
-  const ARTICLES_TRANSLATIONS_COLLECTION_NAME = "articles_translations";
+  const ARTICLES_COLLECTION_NAME = 'articles';
+  const ARTICLES_SECTIONS_COLLECTION_NAME = 'articles_sections';
+  const ARTICLES_SECTIONS_TRANSLATIONS_COLLECTION_NAME = 'articles_sections_translations';
+  const ARTICLES_TRANSLATIONS_COLLECTION_NAME = 'articles_translations';
 
   const ITEM_FIELDS_NOT_TO_CLONE = [
-      "id",
-      "created_by",
-      "created_on",
-      "modified_by",
-      "modified_on",
+      'id',
+      'created_by',
+      'created_on',
+      'modified_by',
+      'modified_on',
   ];
   const ARTICLE_FIELDS_NOT_TO_CLONE = [
       ...ITEM_FIELDS_NOT_TO_CLONE,
-      "status",
-      "author",
-      "publish_date",
-      "deactivate_date",
-      "search_engine_index_on",
-      "destination_id",
-      "tags",
-      "content_translations",
-      "sections"
+      'status',
+      'author',
+      'publish_date',
+      'deactivate_date',
+      'search_engine_index_on',
+      'destination_id',
+      'tags',
+      'content_translations',
+      'sections'
   ];
   const ARTICLE_SECTION_FIELDS_NOT_TO_CLONE = [
       ...ITEM_FIELDS_NOT_TO_CLONE,
-      "content_translations"
+      'content_translations'
   ];
 
   export default {
-    mixins: [mixin],
-    methods: {
+      mixins: [mixin],
+      data() {
+        return {
+          newItem: this.newItem,
+          saving: false
+        };
+      },
+      methods: {
         async clone() {
-            // TODO Loading status
-            // TODO error handling
-
             const cmsId = this.primaryKey;
             const collectionName = this.collection;
 
-            if (collectionName === ARTICLES_COLLECTION_NAME) {
-                await this._cloneArticle(cmsId);
-            } else {
-                this._cloneUnsupported(collectionName);
+            if (collectionName !== ARTICLES_COLLECTION_NAME) {
+                this.$notify({
+                    title: this.$t('interfaces.clone-item.clone-not-supported'),
+                    color: 'red',
+                    iconMain: 'check'
+                });
+
+                return;
             }
 
-          // // Copied from item.vue
-          // const values = Object.assign({}, this.values);
-          //
-          // // Delete fields that shouldn't / can't be duplicated
-          // forEach(this.fields, (info, fieldName) => {
-          //     if (info.primary_key === true) delete values[fieldName];
-          //
-          //     switch (info.type.toLowerCase()) {
-          //         case 'alias':
-          //         case 'datetime_created':
-          //         case 'datetime_updated':
-          //         case 'owner':
-          //         case 'user_updated':
-          //         case 'o2m':
-          //             delete values[fieldName];
-          //             break;
-          //     }
-          // });
-          //
-          // const id = this.$helpers.shortid.generate();
-          // this.$store.dispatch('loadingStart', { id });
-          //
-          // return this.$store
-          //     .dispatch('save', {
-          //         primaryKey: '+',
-          //         values
-          //     })
-          //     .then(res => {
-          //         this.$store.dispatch('loadingFinished', id);
-          //         // TODO Undo
-          //         // this.saving = false;
-          //         return res.data[this.primaryKeyField];
-          //     })
-          //     .then(pk => {
-          //         this.$notify({
-          //             title: this.$tc('item_saved'),
-          //             color: 'green',
-          //             iconMain: 'check'
-          //         });
-          //
-          //         if (this.collection === 'directus_webhooks') {
-          //             return this.$router.push(
-          //                 `/${this.currentProjectKey}/settings/webhooks/${pk}`
-          //             );
-          //         }
-          //
-          //         if (this.collection.startsWith('directus_')) {
-          //             return this.$router.push(
-          //                 `/${this.currentProjectKey}/${this.collection.substring(9)}/${pk}`
-          //             );
-          //         }
-          //
-          //         return this.$router.push(
-          //             `/${this.currentProjectKey}/collections/${this.collection}/${pk}`
-          //         );
-          //     })
-          //     .catch(error => {
-          //         this.$store.dispatch('loadingFinished', id);
-          //         this.$events.emit('error', {
-          //             notify: error.message || this.$t('something_went_wrong_body'),
-          //             error
-          //         });
-          //     });
-        },
-        _cloneUnsupported(collectionName) {
-            this.$events.emit('error', {
-                notify: `Items in ${collectionName} collection do not support cloning.`
-            });
+            this.saving = true;
+            const id = this.$helpers.shortid.generate();
+            this.$store.dispatch('loadingStart', { id });
+
+            let clonedItemId;
+
+            try {
+                if (collectionName === ARTICLES_COLLECTION_NAME) {
+                    clonedItemId = await this._cloneArticle(cmsId);
+                }
+
+                this.$store.dispatch('loadingFinished', id);
+                this.saving = false;
+
+                this.$notify({
+                    title: this.$t('interfaces.clone-item.clone-success'),
+                    color: 'green',
+                    iconMain: 'check'
+                });
+
+                this.$router.push(`/${this.$store.state.currentProjectKey}/collections/${collectionName}/${clonedItemId}`);
+            } catch (error) {
+                this.$store.dispatch('loadingFinished', id);
+                this.saving = false;
+
+                this.$events.emit('error', {
+                    notify: error.message || this.$t('something_went_wrong_body'),
+                    error
+                });
+            }
         },
         async _cloneArticle(cmsId) {
             const { data: originalArticle } = await this.$api.getItem(
@@ -150,6 +118,8 @@
             if (clonedArticleSections.length > 0) {
                 await this._cloneArticleSectionTranslations(originalArticleSections, clonedArticleSections);
             }
+
+            return clonedArticle.id;
         },
         async _cloneArticleItem(articleWithTranslations) {
             const createArticleRequest = omit(articleWithTranslations, ARTICLE_FIELDS_NOT_TO_CLONE);
@@ -159,7 +129,7 @@
             return clonedArticle;
         },
         async _cloneArticleTranslations(originalArticle, clonedArticle) {
-            const createArticleTranslationRequests = get(originalArticle, "content_translations", []).map(ct => {
+            const createArticleTranslationRequests = get(originalArticle, 'content_translations', []).map(ct => {
                 return {
                     ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
                     parent_id: clonedArticle.id
@@ -193,7 +163,7 @@
                 // Get id of cloned section to use as parent id for section translation.
                 const clonedSectionId = clonedArticleSections[index].id;
 
-                const clonedSectionTranslations = get(section, "content_translations", []).map(ct => {
+                const clonedSectionTranslations = get(section, 'content_translations', []).map(ct => {
                     return {
                         ...omit(ct, ITEM_FIELDS_NOT_TO_CLONE),
                         parent_id: clonedSectionId

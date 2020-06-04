@@ -1,7 +1,7 @@
 {
   "name": "clone-item",
   "version": "1.0.0",
-  "description": "",
+  "description": "An extension that provides a clone button on item detail pages to deep copy an item e.g. an article including its sections and translations.",
   "main": "",
   "scripts": {
     "build": "directus-extensions build",

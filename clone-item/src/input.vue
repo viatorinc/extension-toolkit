@@ -23,7 +23,8 @@
     'destination_id',
     'tags',
     'content_translations',
-    'sections'
+    'sections',
+    "external_id"
   ];
 
   const ARTICLES_COLLECTION_NAME = 'articles';

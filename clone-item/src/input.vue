@@ -21,10 +21,11 @@
     'deactivate_date',
     'search_engine_index_on',
     'destination_id',
+    'destinations',
     'tags',
     'content_translations',
     'sections',
-    "external_id"
+    'external_id'
   ];
 
   const ARTICLES_COLLECTION_NAME = 'articles';

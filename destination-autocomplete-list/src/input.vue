@@ -30,18 +30,28 @@
         if(this.value == null) {
           return;
         }
-        return this.value.split(',').map(v => v.split('|')[1]);
+        return this.value.split(',').map(v => v.replace('|', ' - '));
       }
     },
     async mounted() {
       const res = await fetch('/_/custom/destinations');
       const json = await res.json();
-      this.tags = Object.values(json.data).map(v => ({id: v.destinationId, name: v.destinationName}));
+      this.tags = Object.values(json.data).map(v => ({
+          id: `${v.destinationId}|${v.destinationName}`,
+          name: `${v.destinationId} - ${v.destinationName}`
+      }));
     },
     methods: {
         handleSelected: function(selected) {
-            const value = "".concat(`${this.value},`).concat(`${selected.selectedObject.id}|${selected.selectedObject.name}`);
-            this.$emit("input", value);
+            let valueToEmit = '';
+
+            if (this.value) {
+                valueToEmit = ''.concat(`${this.value},`).concat(selected.selectedObject.id);
+            } else {
+                valueToEmit = selected.selectedObject.id;
+            }
+
+            this.$emit('input', valueToEmit);
       },
       formatResults: (res) => {
         console.warn(res);

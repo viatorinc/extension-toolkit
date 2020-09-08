@@ -12,7 +12,7 @@
     computed: {
       displayValue() {
         if (this.value) {
-          return this.value.split(',').map(v => v.split('|')[1]);
+          return this.value.split(',').map(v => v.replace('|', ' - '));
         }
       }
     }

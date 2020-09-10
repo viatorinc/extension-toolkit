@@ -5,14 +5,14 @@
 </template>
 
 <script>
-  import mixin from "@directus/extension-toolkit/mixins/interface";
+  import mixin from '@directus/extension-toolkit/mixins/interface';
 
   export default {
     mixins: [mixin],
     computed: {
       displayValue() {
         if (this.value) {
-          return this.value.split(',').map(v => v.split('|')[1]);
+          return this.value.split(',').map(v => v.replace('|', ' - '));
         }
       }
     }

@@ -5,7 +5,7 @@
                   :resultsFormatter='formatResults'
                   input-class="autocomplete-input">
     </autocomplete>
-    
+
     <input :value="formattedValue" class="max-width"/>
   </div>
 </template>
@@ -29,18 +29,20 @@
         if(this.value == null) {
           return;
         }
-        return this.value.split('|')[1];
+        return this.value.replace('|', ' - ');
       }
     },
     async mounted() {
       const res = await fetch('/_/custom/destinations');
       const json = await res.json();
-      this.tags = Object.values(json.data).map(v => ({id: v.destinationId, name: v.destinationName}));
+      this.tags = Object.values(json.data).map(v => ({
+          id: `${v.destinationId}|${v.destinationName}`,
+          name: `${v.destinationId} - ${v.destinationName}`
+      }));
     },
     methods: {
         handleSelected: function(selected) {
-            const value = `${selected.selectedObject.id}|${selected.selectedObject.name}`;
-            this.$emit("input", value);
+            this.$emit('input', selected.selectedObject.id);
       },
       formatResults: (res) => {
         console.warn(res);

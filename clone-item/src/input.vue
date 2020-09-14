@@ -25,7 +25,7 @@
     'tags',
     'content_translations',
     'sections',
-    'external_id'
+    'public_id'
   ];
 
   const ARTICLES_COLLECTION_NAME = 'articles';

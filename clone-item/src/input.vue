@@ -25,6 +25,7 @@
     'tags',
     'content_translations',
     'sections',
+    'external_id',
     'public_id'
   ];
 
